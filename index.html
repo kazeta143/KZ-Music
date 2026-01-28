@@ -2802,21 +2802,9 @@
                 provider.addScope('profile');
                 provider.addScope('email');
                 
-                // Intentar signInWithPopup primero
-                try {
-                    const result = await auth.signInWithPopup(provider);
-                    console.log('✅ Login con popup exitoso');
-                    showToast('¡Bienvenido, ' + result.user.displayName + '!');
-                } catch (popupError) {
-                    // Si el popup falla, usar redirect como fallback
-                    if (popupError.code === 'auth/popup-blocked' || 
-                        popupError.code === 'auth/popup-closed-by-user') {
-                        console.log('Popup bloqueado, usando redirect...');
-                        await auth.signInWithRedirect(provider);
-                    } else {
-                        throw popupError;
-                    }
-                }
+                // Usar signInWithRedirect para compatibilidad móvil
+                console.log('Redirigiendo a Google Sign-In...');
+                await auth.signInWithRedirect(provider);
                 
             } catch (error) {
                 console.error('❌ Error:', error);
@@ -2835,6 +2823,25 @@
                 showToast(errorMsg);
             }
         }
+
+        // Procesar el resultado del redirect cuando el usuario regrese
+        auth.getRedirectResult().then((result) => {
+            if (result.user) {
+                console.log('✅ Login con redirect exitoso');
+                showToast('¡Bienvenido, ' + result.user.displayName + '!');
+            }
+        }).catch((error) => {
+            if (error.code && error.code !== 'auth/operation-not-supported-in-this-environment') {
+                console.error('❌ Error en redirect result:', error);
+                let errorMsg = 'Error al iniciar sesión';
+                if (error.code === 'auth/unauthorized-domain') {
+                    errorMsg = 'Dominio no autorizado en Firebase';
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMsg = 'Error de conexión';
+                }
+                showToast(errorMsg);
+            }
+        });
 
         async function desvincularGoogle() {
             try {
