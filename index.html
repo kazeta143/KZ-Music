@@ -1,4 +1,4 @@
-          <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -2797,49 +2797,83 @@
             }
 
             try {
-                console.log('Iniciando vinculación con Google...');
+                console.log('🔐 INICIANDO LOGIN CON GOOGLE');
+                console.log('📍 URL actual:', window.location.href);
+                console.log('🌐 Hostname:', window.location.hostname);
+                
                 const provider = new firebase.auth.GoogleAuthProvider();
                 provider.addScope('profile');
                 provider.addScope('email');
                 
+                console.log('✅ Provider configurado');
+                console.log('🚀 Llamando a signInWithRedirect...');
+                
                 // Usar signInWithRedirect para compatibilidad móvil
-                console.log('Redirigiendo a Google Sign-In...');
                 await auth.signInWithRedirect(provider);
+                console.log('✅ signInWithRedirect ejecutado (redirigiendo...)');
                 
             } catch (error) {
-                console.error('❌ Error:', error);
-                console.error('Código:', error.code);
-                console.error('Mensaje:', error.message);
+                console.error('❌ ERROR COMPLETO:', error);
+                console.error('❌ Código de error:', error.code);
+                console.error('❌ Mensaje:', error.message);
+                console.error('❌ Stack:', error.stack);
                 
                 let errorMsg = 'Error al vincular con Google';
+                
                 if (error.code === 'auth/operation-not-supported-in-this-environment') {
-                    errorMsg = 'Abre la app en Chrome o Safari';
+                    errorMsg = '⚠️ Navegador no compatible. Usa Chrome/Safari/Firefox';
+                    console.error('SOLUCIÓN: Abre en un navegador compatible');
                 } else if (error.code === 'auth/unauthorized-domain') {
-                    errorMsg = 'Dominio no autorizado. Configura Firebase Console';
+                    errorMsg = '⚠️ Dominio no autorizado en Firebase';
+                    console.error('SOLUCIÓN: Ve a Firebase Console → Authentication → Settings → Authorized domains');
+                    console.error('AGREGA: kazeta143.github.io');
                 } else if (error.code === 'auth/network-request-failed') {
-                    errorMsg = 'Error de conexión. Verifica tu internet';
+                    errorMsg = '⚠️ Sin conexión a internet';
+                } else if (error.code === 'auth/internal-error') {
+                    errorMsg = '⚠️ Error interno de Firebase';
+                    console.error('POSIBLE CAUSA: Configuración de Firebase incorrecta');
                 }
                 
                 showToast(errorMsg);
+                alert('ERROR DETALLADO:\n\nCódigo: ' + error.code + '\n\nMensaje: ' + error.message + '\n\nRevisa la consola del navegador para más detalles.');
             }
         }
 
         // Procesar el resultado del redirect cuando el usuario regrese
+        console.log('🔄 Verificando resultado de redirect...');
         auth.getRedirectResult().then((result) => {
-            if (result.user) {
-                console.log('✅ Login con redirect exitoso');
+            console.log('📥 getRedirectResult recibido:', result);
+            if (result && result.user) {
+                console.log('✅ LOGIN EXITOSO!');
+                console.log('👤 Usuario:', result.user.displayName);
+                console.log('📧 Email:', result.user.email);
+                console.log('🆔 UID:', result.user.uid);
                 showToast('¡Bienvenido, ' + result.user.displayName + '!');
+            } else {
+                console.log('ℹ️ No hay resultado de redirect (carga normal de la página)');
             }
         }).catch((error) => {
+            console.error('❌ ERROR EN getRedirectResult:', error);
+            console.error('❌ Código:', error.code);
+            console.error('❌ Mensaje:', error.message);
+            
             if (error.code && error.code !== 'auth/operation-not-supported-in-this-environment') {
-                console.error('❌ Error en redirect result:', error);
                 let errorMsg = 'Error al iniciar sesión';
+                
                 if (error.code === 'auth/unauthorized-domain') {
-                    errorMsg = 'Dominio no autorizado en Firebase';
+                    errorMsg = '⚠️ Dominio no autorizado en Firebase';
+                    console.error('SOLUCIÓN: Autoriza kazeta143.github.io en Firebase Console');
                 } else if (error.code === 'auth/network-request-failed') {
-                    errorMsg = 'Error de conexión';
+                    errorMsg = '⚠️ Error de conexión';
+                } else if (error.code === 'auth/popup-closed-by-user') {
+                    errorMsg = 'Cancelaste el inicio de sesión';
+                } else if (error.code === 'auth/cancelled-popup-request') {
+                    console.log('ℹ️ Popup cancelado (normal si se abrió otro)');
+                    return; // No mostrar error
                 }
+                
                 showToast(errorMsg);
+                alert('ERROR AL REGRESAR DE GOOGLE:\n\nCódigo: ' + error.code + '\n\nMensaje: ' + error.message);
             }
         });
 
