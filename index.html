@@ -1027,6 +1027,41 @@
         <div class="splash-text">MUSIC</div>
     </div>
 
+    <!-- HEADER CON PERFIL -->
+    <div class="top-header">
+        <div class="header-logo">
+            <div class="header-logo-icon">KZ</div>
+            <span class="header-logo-text">MUSIC</span>
+        </div>
+        
+        <div class="profile-container">
+            <div class="profile-icon" onclick="toggleProfileDropdown()">
+                <span id="profile-icon-text">👤</span>
+                <img id="profile-icon-img" style="display: none;">
+            </div>
+            
+            <div class="profile-dropdown" id="profile-dropdown">
+                <div class="dropdown-header">
+                    <div class="dropdown-user-info">
+                        <div class="dropdown-user-avatar" id="dropdown-avatar">👤</div>
+                        <div class="dropdown-user-details">
+                            <div class="dropdown-user-name" id="dropdown-name">Usuario Local</div>
+                            <div class="dropdown-user-email" id="dropdown-email">Sin cuenta vinculada</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dropdown-menu-item" onclick="changePage('perfil'); toggleProfileDropdown();">
+                    <span class="dropdown-menu-icon">⚙️</span>
+                    <span class="dropdown-menu-text">Configuración</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overlay para cerrar dropdown -->
+    <div class="profile-overlay" id="profile-overlay" onclick="toggleProfileDropdown()"></div>
+
     <div id="page-principal" class="page active">
         <div class="header-main">KZ MUSIC</div>
         <div class="section-title">Canciones</div>
@@ -2785,6 +2820,22 @@
             }
         });
 
+        // ===== FUNCIÓN PARA TOGGLE DEL DROPDOWN DE PERFIL =====
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profile-dropdown');
+            const overlay = document.getElementById('profile-overlay');
+            
+            if (dropdown && overlay) {
+                dropdown.classList.toggle('show');
+                
+                if (dropdown.classList.contains('show')) {
+                    overlay.style.display = 'block';
+                } else {
+                    overlay.style.display = 'none';
+                }
+            }
+        }
+
         // ===== FUNCIONES DE GOOGLE SIGN-IN (ACTUALIZADAS) =====
         let usuarioActual = null;
 
@@ -2893,11 +2944,11 @@
             usuarioActual = user;
             
             // Elementos del dropdown del header
-            const profileIcon = document.getElementById('profile-icon-text');
-            const profileImg = document.getElementById('profile-icon-img');
-            const dropdownAvatar = document.querySelector('.dropdown-user-avatar');
-            const dropdownName = document.querySelector('.dropdown-user-name');
-            const dropdownEmail = document.querySelector('.dropdown-user-email');
+            const profileIconText = document.getElementById('profile-icon-text');
+            const profileIconImg = document.getElementById('profile-icon-img');
+            const dropdownAvatar = document.getElementById('dropdown-avatar');
+            const dropdownName = document.getElementById('dropdown-name');
+            const dropdownEmail = document.getElementById('dropdown-email');
             
             // Elementos de la página de perfil
             const perfilAvatar = document.getElementById('perfil-avatar');
@@ -2915,30 +2966,30 @@
                 // ===== ACTUALIZAR HEADER (icono superior derecho) =====
                 if (user.photoURL) {
                     // Mostrar foto de perfil en el header
-                    if (profileImg) {
-                        profileImg.src = user.photoURL;
-                        profileImg.style.display = 'block';
+                    if (profileIconImg) {
+                        profileIconImg.src = user.photoURL;
+                        profileIconImg.style.display = 'block';
                     }
-                    if (profileIcon) {
-                        profileIcon.style.display = 'none';
+                    if (profileIconText) {
+                        profileIconText.style.display = 'none';
                     }
                 } else {
                     // Mostrar inicial si no hay foto
-                    if (profileIcon) {
-                        profileIcon.textContent = user.displayName ? user.displayName[0].toUpperCase() : '👤';
-                        profileIcon.style.display = 'block';
+                    if (profileIconText) {
+                        profileIconText.textContent = user.displayName ? user.displayName[0].toUpperCase() : '👤';
+                        profileIconText.style.display = 'block';
                     }
-                    if (profileImg) {
-                        profileImg.style.display = 'none';
+                    if (profileIconImg) {
+                        profileIconImg.style.display = 'none';
                     }
                 }
                 
                 // ===== ACTUALIZAR DROPDOWN DEL HEADER =====
                 if (dropdownAvatar) {
                     if (user.photoURL) {
-                        dropdownAvatar.innerHTML = `<img src="${user.photoURL}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                        dropdownAvatar.innerHTML = `<img src="${user.photoURL}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
                     } else {
-                        dropdownAvatar.textContent = user.displayName ? user.displayName[0].toUpperCase() : '👤';
+                        dropdownAvatar.innerHTML = user.displayName ? user.displayName[0].toUpperCase() : '👤';
                         dropdownAvatar.style.background = '#ff0000';
                     }
                 }
@@ -2982,19 +3033,19 @@
                 console.log('❌ Sin usuario autenticado');
                 
                 // ===== RESTAURAR ESTADO SIN USUARIO (HEADER) =====
-                if (profileIcon) {
-                    profileIcon.textContent = '👤';
-                    profileIcon.style.display = 'block';
+                if (profileIconText) {
+                    profileIconText.textContent = '👤';
+                    profileIconText.style.display = 'block';
                 }
-                if (profileImg) {
-                    profileImg.style.display = 'none';
+                if (profileIconImg) {
+                    profileIconImg.style.display = 'none';
                 }
                 
                 // ===== RESTAURAR DROPDOWN =====
                 if (dropdownAvatar) {
                     dropdownAvatar.textContent = '👤';
                     dropdownAvatar.style.background = '#666';
-                    dropdownAvatar.style.backgroundImage = 'none';
+                    dropdownAvatar.innerHTML = '👤';
                 }
                 
                 if (dropdownName) {
