@@ -2888,69 +2888,142 @@
             }
         }
 
-        // Observar estado de autenticación
+        // Observar estado de autenticación (estilo YouTube Music)
         auth.onAuthStateChanged((user) => {
             usuarioActual = user;
-            const avatar = document.getElementById('perfil-avatar');
-            const name = document.getElementById('perfil-name');
-            const email = document.getElementById('perfil-email');
+            
+            // Elementos del dropdown del header
+            const profileIcon = document.getElementById('profile-icon-text');
+            const profileImg = document.getElementById('profile-icon-img');
+            const dropdownAvatar = document.querySelector('.dropdown-user-avatar');
+            const dropdownName = document.querySelector('.dropdown-user-name');
+            const dropdownEmail = document.querySelector('.dropdown-user-email');
+            
+            // Elementos de la página de perfil
+            const perfilAvatar = document.getElementById('perfil-avatar');
+            const perfilName = document.getElementById('perfil-name');
+            const perfilEmail = document.getElementById('perfil-email');
             const btnVincular = document.getElementById('btn-vincular');
             const msgVinculado = document.getElementById('msg-vinculado');
             const btnDesvincular = document.getElementById('btn-desvincular');
             
             if (user) {
-                console.log('👤 Usuario conectado:', user.email);
+                console.log('✅ Usuario autenticado:', user.email);
+                console.log('👤 Nombre:', user.displayName);
+                console.log('📸 Foto:', user.photoURL);
                 
-                name.textContent = user.displayName || 'Usuario';
-                email.textContent = user.email;
-                
+                // ===== ACTUALIZAR HEADER (icono superior derecho) =====
                 if (user.photoURL) {
-                    avatar.style.backgroundImage = `url(${user.photoURL})`;
-                    avatar.style.backgroundSize = 'cover';
-                    avatar.textContent = '';
+                    // Mostrar foto de perfil en el header
+                    if (profileImg) {
+                        profileImg.src = user.photoURL;
+                        profileImg.style.display = 'block';
+                    }
+                    if (profileIcon) {
+                        profileIcon.style.display = 'none';
+                    }
                 } else {
-                    avatar.textContent = user.displayName ? user.displayName[0].toUpperCase() : '👤';
-                    avatar.style.background = '#ff0000';
-                }
-                
-                btnVincular.style.display = 'none';
-                msgVinculado.style.display = 'flex';
-                btnDesvincular.style.display = 'block';
-                
-                // Actualizar header
-                const profileIcon = document.getElementById('profile-icon-text');
-                if (profileIcon) {
-                    if (user.photoURL) {
-                        const img = document.getElementById('profile-icon-img');
-                        if (img) {
-                            img.src = user.photoURL;
-                            img.style.display = 'block';
-                            profileIcon.style.display = 'none';
-                        }
-                    } else {
+                    // Mostrar inicial si no hay foto
+                    if (profileIcon) {
                         profileIcon.textContent = user.displayName ? user.displayName[0].toUpperCase() : '👤';
+                        profileIcon.style.display = 'block';
+                    }
+                    if (profileImg) {
+                        profileImg.style.display = 'none';
                     }
                 }
+                
+                // ===== ACTUALIZAR DROPDOWN DEL HEADER =====
+                if (dropdownAvatar) {
+                    if (user.photoURL) {
+                        dropdownAvatar.innerHTML = `<img src="${user.photoURL}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    } else {
+                        dropdownAvatar.textContent = user.displayName ? user.displayName[0].toUpperCase() : '👤';
+                        dropdownAvatar.style.background = '#ff0000';
+                    }
+                }
+                
+                if (dropdownName) {
+                    dropdownName.textContent = user.displayName || 'Usuario';
+                }
+                
+                if (dropdownEmail) {
+                    dropdownEmail.textContent = user.email;
+                }
+                
+                // ===== ACTUALIZAR PÁGINA DE PERFIL =====
+                if (perfilName) {
+                    perfilName.textContent = user.displayName || 'Usuario';
+                }
+                
+                if (perfilEmail) {
+                    perfilEmail.textContent = user.email;
+                }
+                
+                if (perfilAvatar) {
+                    if (user.photoURL) {
+                        perfilAvatar.style.backgroundImage = `url(${user.photoURL})`;
+                        perfilAvatar.style.backgroundSize = 'cover';
+                        perfilAvatar.style.backgroundPosition = 'center';
+                        perfilAvatar.textContent = '';
+                    } else {
+                        perfilAvatar.textContent = user.displayName ? user.displayName[0].toUpperCase() : '👤';
+                        perfilAvatar.style.backgroundImage = 'none';
+                        perfilAvatar.style.background = '#ff0000';
+                    }
+                }
+                
+                // ===== MOSTRAR/OCULTAR BOTONES =====
+                if (btnVincular) btnVincular.style.display = 'none';
+                if (msgVinculado) msgVinculado.style.display = 'flex';
+                if (btnDesvincular) btnDesvincular.style.display = 'block';
+                
             } else {
-                console.log('👤 Sin usuario');
+                console.log('❌ Sin usuario autenticado');
                 
-                name.textContent = 'Usuario Local';
-                email.textContent = 'Sin cuenta vinculada';
-                avatar.textContent = '👤';
-                avatar.style.background = '#666';
-                avatar.style.backgroundImage = 'none';
-                
-                btnVincular.style.display = 'flex';
-                msgVinculado.style.display = 'none';
-                btnDesvincular.style.display = 'none';
-                
-                const profileIcon = document.getElementById('profile-icon-text');
+                // ===== RESTAURAR ESTADO SIN USUARIO (HEADER) =====
                 if (profileIcon) {
                     profileIcon.textContent = '👤';
                     profileIcon.style.display = 'block';
-                    const img = document.getElementById('profile-icon-img');
-                    if (img) img.style.display = 'none';
                 }
+                if (profileImg) {
+                    profileImg.style.display = 'none';
+                }
+                
+                // ===== RESTAURAR DROPDOWN =====
+                if (dropdownAvatar) {
+                    dropdownAvatar.textContent = '👤';
+                    dropdownAvatar.style.background = '#666';
+                    dropdownAvatar.style.backgroundImage = 'none';
+                }
+                
+                if (dropdownName) {
+                    dropdownName.textContent = 'Usuario Local';
+                }
+                
+                if (dropdownEmail) {
+                    dropdownEmail.textContent = 'Sin cuenta vinculada';
+                }
+                
+                // ===== RESTAURAR PÁGINA DE PERFIL =====
+                if (perfilName) {
+                    perfilName.textContent = 'Usuario Local';
+                }
+                
+                if (perfilEmail) {
+                    perfilEmail.textContent = 'Sin cuenta vinculada';
+                }
+                
+                if (perfilAvatar) {
+                    perfilAvatar.textContent = '👤';
+                    perfilAvatar.style.backgroundImage = 'none';
+                    perfilAvatar.style.background = '#666';
+                }
+                
+                // ===== MOSTRAR/OCULTAR BOTONES =====
+                if (btnVincular) btnVincular.style.display = 'flex';
+                if (msgVinculado) msgVinculado.style.display = 'none';
+                if (btnDesvincular) btnDesvincular.style.display = 'none';
             }
         });
     </script>
